@@ -9,6 +9,7 @@ plt.style.use('dark_background')
 df = pd.read_csv("data.csv")
  
 df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d')
+df['Rain_Status'] = df['RAIN'].apply(lambda x: 'Rain' if x > 0 else 'No Rain')
 
 st.title("Dashboard Visualisation Air Quality")
 st.image('img.jpg', use_column_width=True)
@@ -66,24 +67,37 @@ demographic_df = filtered_df.groupby('station').agg(
         O3=('O3', 'mean')
     ).reset_index()
 
+
+plt.figure(figsize=(14, 6))
+plt.subplot(1, 2, 1)
+sns.boxplot(x='Rain_Status', y='PM2.5', data=filtered_df)
+plt.title('PM2.5 Concentration on Rainy vs Non-Rainy Days')
+plt.xlabel('Rain Status')
+plt.ylabel('PM2.5')
+
+plt.subplot(1, 2, 2)
+sns.boxplot(x='Rain_Status', y='PM10', data=filtered_df)
+plt.title('PM10 Concentration on Rainy vs Non-Rainy Days')
+plt.xlabel('Rain Status')
+plt.ylabel('PM10')
+st.pyplot(plt)
+
+
+
 def plot_average_pollutant(demographic_df, pollutant):
     """Fungsi untuk membuat grafik rata-rata polutan."""
     fig = px.bar(demographic_df, x='station', y=pollutant,
                  labels={pollutant: f'Rata-rata {pollutant}', 'station': 'Station'})
     return fig
 
-def plot_time_series(filtered_df, pollutant):
-    """Fungsi untuk membuat grafik time series."""
-    fig = px.line(filtered_df, x='datetime', y=pollutant, color='station', title=f'Time Series {pollutant} per Station',
-                   labels={'datetime': 'Tanggal', pollutant: pollutant})
-    return fig
+
+
 
 
 st.subheader("Rata-rata PM2.5 per Station")
 st.plotly_chart(plot_average_pollutant(demographic_df, 'PM2_5'))
 
-st.subheader("Time Series PM2.5")
-st.plotly_chart(plot_time_series(filtered_df, 'PM2.5'))
+
 
 st.subheader("Scatter Plot PM2.5 vs PM10")
 plt.figure(figsize=(10, 6))
@@ -99,3 +113,5 @@ sns.scatterplot(
 plt.xlabel('PM2.5 Concentration', fontsize=12)
 plt.ylabel('PM10 Concentration', fontsize=12)
 st.pyplot(plt)
+
+
