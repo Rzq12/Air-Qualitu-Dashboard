@@ -67,7 +67,7 @@ demographic_df = filtered_df.groupby('station').agg(
         O3=('O3', 'mean')
     ).reset_index()
 
-
+st.subheader("Konsentrasi PM2.5 dan PM10")
 plt.figure(figsize=(14, 6))
 plt.subplot(1, 2, 1)
 sns.boxplot(x='Rain_Status', y='PM2.5', data=filtered_df)
